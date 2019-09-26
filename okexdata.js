@@ -51,7 +51,7 @@ async function updateToMongo(data) {
   }
 };
 
-console.log('app working..');
+console.log('app working..', process.env.MONGOURL);
 // 1 1 1 1 * * *
 new CronJob('1 1 1 1 * * *', function () {
   console.log('running on', new Date());
