@@ -1,0 +1,109 @@
+<html>
+
+<style>
+  * {
+    color: #2b2b2b;
+    font-family: "Roboto Condensed";
+  }
+
+  th {
+    text-align: left;
+    color: #4679bd;
+  }
+
+  tbody>tr:nth-of-type(even) {
+    background-color: #daeaff;
+  }
+
+  button {
+    cursor: pointer;
+    margin-top: 1rem;
+  }
+</style>
+
+<body onload="process()">
+  <button onclick="onBtClick()">Export HTML table to CSV file</button>
+  <div id='tableDiv'>
+  </div>
+</body>
+<script src='btc3min.js'></script>
+<script>
+  function process() {
+    const ps = okmin.data.map(t => {
+      return {
+        ts: t[0],
+        pOpen: parseFloat(t[1]),
+        pClose: parseFloat(t[2]),
+        pHigh: parseFloat(t[3]),
+        pLow: parseFloat(t[4])
+      };
+    });
+
+    let htmlStr = '<table>';
+    // head
+    htmlStr += '<tr>';
+    htmlStr += Object.keys(ps[0]).map(k => `<th>${k}</th>`).join('');
+    htmlStr += '</tr>';
+
+    // body
+    ps.forEach(p => {
+      htmlStr += '<tr>';
+      htmlStr += Object.keys(p).map(k => `<td>${p[k]}</td>`).join('');
+      htmlStr += '</tr>';
+    });
+    htmlStr += '</table>';
+
+    document.querySelector('#tableDiv').innerHTML = htmlStr;
+  }
+
+  function download_csv(csv, filename) {
+    var csvFile;
+    var downloadLink;
+
+    // CSV FILE
+    csvFile = new Blob([csv], { type: "text/csv" });
+
+    // Download link
+    downloadLink = document.createElement("a");
+
+    // File name
+    downloadLink.download = filename;
+
+    // We have to create a link to the file
+    downloadLink.href = window.URL.createObjectURL(csvFile);
+
+    // Make sure that the link is not displayed
+    downloadLink.style.display = "none";
+
+    // Add the link to your DOM
+    document.body.appendChild(downloadLink);
+
+    // Lanzamos
+    downloadLink.click();
+  }
+
+  function export_table_to_csv(html, filename) {
+    var csv = [];
+    var rows = document.querySelectorAll("table tr");
+
+    for (var i = 0; i < rows.length; i++) {
+      var row = [], cols = rows[i].querySelectorAll("td, th");
+
+      for (var j = 0; j < cols.length; j++)
+        row.push(cols[j].innerText);
+
+      csv.push(row.join(","));
+    }
+
+    // Download CSV
+    download_csv(csv.join("\n"), filename);
+  }
+
+  function onBtClick() {
+    var html = document.querySelector("table").outerHTML;
+    export_table_to_csv(html, "table.csv");
+  }
+
+</script>
+
+</html>
