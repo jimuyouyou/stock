@@ -53,8 +53,9 @@ async function updateToMongo(data, minute) {
 
 console.log('app working..', process.env.MONGOURL);
 // 1 1 1 1 * * *
-new CronJob('1 1 1 1 * * *', function () {
+new CronJob('1 1 1,13 1 * *', function () {
   console.log('running on', new Date());
+  getUser(1); // 1min
   getUser(3); // 3min
   getUser(5); // 5min
 }, null, true, 'America/Los_Angeles');
