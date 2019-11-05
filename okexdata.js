@@ -8,7 +8,7 @@ const url = process.env.MONGOURL || '';
 async function getUser(minute) {
   try {
     const ts = new Date().getTime();
-    const response = await axios.get(`https://www.okex.com/v2/spot/instruments/BTC-USDT/candles?granularity=${minute*60}&size=1000`);
+    const response = await axios.get(`https://www.okex.com/v2/spot/instruments/BTC-USDT/candles?granularity=${minute * 60}&size=1000`);
     const data = response.data.data.map(d => {
       return {
         _id: d[0],
@@ -25,7 +25,7 @@ async function getUser(minute) {
   } catch (error) {
     console.error(error);
   } finally {
-    console.log('done.');
+    console.log('get okex api data done.');
   }
 }
 
@@ -52,11 +52,17 @@ async function updateToMongo(data, minute) {
 };
 
 console.log('app working..', process.env.MONGOURL);
-new CronJob('1 1 1,13 * * *', function () {
-  console.log('running on', new Date());
-  getUser(1); // 1min
-  getUser(3); // 3min
-  getUser(5); // 5min
+// 1 1 1,13 * * *
+new CronJob('1 1 1,13 * * *', async () => {
+  console.log('\n\nrunning on', new Date());
+  await getUser(1); // 1min
+  await getUser(3); // 3min
+  await getUser(5); // 5min
+  await getUser(15); // 15min
+  await getUser(60); // 1hour
+  await getUser(60 * 2); // 2hour
+  await getUser(60 * 4); // 4hour
+  console.log('completed on', new Date());
 }, null, true, 'America/Los_Angeles');
 
 // getUser(3);
