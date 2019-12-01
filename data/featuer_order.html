@@ -2,12 +2,32 @@
 
 <head>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.15/lodash.core.min.js"></script>
+  <style>
+    table {
+      border-collapse: collapse;
+    }
+
+    td {
+      border: 1px solid black;
+    }
+
+    .sorting {
+      color: blue;
+      cursor: pointer;
+    }
+  </style>
 </head>
 
-<body>
+<body onload="showDefaultTable();">
+  <div id="modelPeformance"></div>
+  <hr>
+  <div id='tableContainer'></div>
 
 </body>
 <script>
+  const H100_WEIGHTS = ['RandomForestClassifer', 'XGBClassifier'];
+  let featureArray = [];
+
   const fs = [{
     model: 'SGDClassifer',
     performance: 15.3,
@@ -34,28 +54,90 @@
     data: [['2h_CDLMATHOLD', 0.0], ['2h_CDLBREAKAWAY', 0.0], ['2h_CDLDOJISTAR', 0.0], ['2h_CDLHIKKAKEMOD', 0.0], ['2h_CDLLADDERBOTTOM', 0.0], ['2h_CDLRISEFALL3METHODS', 0.0], ['2h_CDLCONCEALBABYSWALL', 0.0], ['2h_CDL2CROWS', 0.0], ['2h_CDL3LINESTRIKE', 0.0], ['2h_CDL3BLACKCROWS', 0.0], ['2h_CDLUNIQUE3RIVER', 0.0], ['2h_CDLKICKING', 0.0], ['2h_CDLKICKINGBYLENGTH', 0.0], ['2h_CDLIDENTICAL3CROWS', 0.0], ['2h_CDLTRISTAR', 0.0], ['2h_CDLGAPSIDESIDEWHITE', 0.0], ['2h_CDLDARKCLOUDCOVER', 0.0], ['2h_CDLMORNINGSTAR', 0.0], ['2h_CDLINNECK', 0.0], ['2h_CDLONNECK', 0.0], ['2h_CDLCOUNTERATTACK', 0.0], ['2h_CDL3STARSINSOUTH', 0.0], ['2h_CDLEVENINGDOJISTAR', 0.0], ['2h_CDLMORNINGDOJISTAR', 0.0], ['2h_CDLUPSIDEGAP2CROWS', 0.0], ['2h_CDLHOMINGPIGEON', 0.0], ['2h_CDLPIERCING', 0.0], ['2h_CDLABANDONEDBABY', 0.0], ['2h_CDLSTICKSANDWICH', 0.0], ['12h_CDLMATHOLD', 0.0], ['12h_CDLBREAKAWAY', 0.0], ['12h_CDLHIKKAKEMOD', 0.0], ['12h_CDLLADDERBOTTOM', 0.0], ['12h_CDLRISEFALL3METHODS', 0.0], ['12h_CDLTASUKIGAP', 0.0], ['12h_CDLCONCEALBABYSWALL', 0.0], ['12h_CDLINVERTEDHAMMER', 0.0], ['12h_CDL2CROWS', 0.0], ['12h_CDL3LINESTRIKE', 0.0], ['12h_CDLSTALLEDPATTERN', 0.0], ['12h_CDL3BLACKCROWS', 0.0], ['12h_CDLUNIQUE3RIVER', 0.0], ['12h_CDL3WHITESOLDIERS', 0.0], ['12h_CDLKICKING', 0.0], ['12h_CDLKICKINGBYLENGTH', 0.0], ['12h_CDLIDENTICAL3CROWS', 0.0], ['12h_CDLTRISTAR', 0.0], ['12h_CDLGAPSIDESIDEWHITE', 0.0], ['12h_CDLMORNINGSTAR', 0.0], ['12h_CDLINNECK', 0.0], ['12h_CDLONNECK', 0.0], ['12h_CDLCOUNTERATTACK', 0.0], ['12h_CDL3STARSINSOUTH', 0.0], ['12h_CDLEVENINGDOJISTAR', 0.0], ['12h_CDLMORNINGDOJISTAR', 0.0], ['12h_CDLUPSIDEGAP2CROWS', 0.0], ['12h_CDLTHRUSTING', 0.0], ['12h_CDLHOMINGPIGEON', 0.0], ['12h_CDLPIERCING', 0.0], ['12h_CDLABANDONEDBABY', 0.0], ['12h_CDLEVENINGSTAR', 0.0], ['12h_CDLSTICKSANDWICH', 0.0], ['2h_CDLHARAMICROSS', 0.0017391085], ['2h_CDLXSIDEGAP3METHODS', 0.0026703614], ['2h_CDL3WHITESOLDIERS', 0.0049547385], ['12h_CDLHARAMICROSS', 0.006116293], ['12h_HT_TRENDMODE', 0.0061506913], ['12h_CDLGRAVESTONEDOJI', 0.006718129], ['2h_HT_DCPERIOD', 0.006744384], ['2h_CDLTHRUSTING', 0.0068080905], ['2h_CDL3INSIDE', 0.006844308], ['12h_DX', 0.0068921284], ['2h_CDLTASUKIGAP', 0.0070326924], ['12h_ADX', 0.0070992648], ['12h_HT_DCPHASE', 0.0073046223], ['12h_CDLHAMMER', 0.0073308605], ['12h_CDL3INSIDE', 0.0074531767], ['12h_WILLR', 0.007454603], ['2h_CMO', 0.007484344], ['12h_PPO1', 0.007510935], ['12h_CDLLONGLEGGEDDOJI', 0.0075140037], ['2h_PPO2', 0.007524774], ['12h_RSI', 0.0076096873], ['2h_ADX', 0.0076750712], ['12h_CCI', 0.007745791], ['12h_CDLDRAGONFLYDOJI', 0.007746291], ['12h_HT_SINE', 0.007758133], ['12h_STOCHF', 0.007826242], ['12h_CDLBELTHOLD', 0.007834388], ['2h_CDLMATCHINGLOW', 0.007864183], ['12h_TRIX', 0.007912021], ['2h_STOCHF', 0.007925613], ['12h_HT_PHASOR', 0.007961343], ['2h_MFI', 0.007967982], ['12h_ULTOSC', 0.007985881], ['12h_PPO2', 0.008015514], ['2h_WILLR', 0.008030714], ['12h_CDLLONGLINE', 0.008055876], ['2h_HT_SINE', 0.008155716], ['2h_ULTOSC', 0.008169167], ['2h_DX', 0.008172688], ['2h_STOCHRSI', 0.008172868], ['2h_HT_DCPHASE', 0.008253407], ['12h_AROONOSC', 0.00837656], ['2h_AROONOSC', 0.008447013], ['12h_HT_DCPERIOD', 0.008499744], ['2h_PPO1', 0.008515037], ['2h_STOCH', 0.008561264], ['12h_MFI', 0.008597082], ['2h_TRIX', 0.008598709], ['12h_STOCH', 0.008719588], ['12h_STOCHRSI', 0.008735583], ['2h_HT_TRENDMODE', 0.008811087], ['12h_CDLRICKSHAWMAN', 0.008826421], ['2h_HT_PHASOR', 0.008927663], ['12h_CDLMATCHINGLOW', 0.00896993], ['2h_CCI', 0.009172719], ['2h_CDLHARAMI', 0.009187829], ['12h_CDLMARUBOZU', 0.009399981], ['12h_CMO', 0.009647711], ['2h_CDLSHORTLINE', 0.009753032], ['2h_CDLENGULFING', 0.0097931335], ['2h_CDLCLOSINGMARUBOZU', 0.009877941], ['12h_CDLDOJI', 0.009880465], ['12h_CDLHIKKAKE', 0.009975562], ['2h_CDLHIGHWAVE', 0.009976349], ['12h_CDLCLOSINGMARUBOZU', 0.010098745], ['12h_CDLSPINNINGTOP', 0.01028659], ['12h_CDLDARKCLOUDCOVER', 0.010299606], ['12h_CDLSHORTLINE', 0.010336074], ['2h_CDLRICKSHAWMAN', 0.010392776], ['2h_CDLHIKKAKE', 0.010439168], ['2h_CDLDOJI', 0.010553823], ['2h_CDLHANGINGMAN', 0.01057511], ['12h_CDL3OUTSIDE', 0.0106982], ['2h_CDLGRAVESTONEDOJI', 0.010865725], ['12h_CDLHIGHWAVE', 0.010880766], ['12h_CDLHARAMI', 0.011367543], ['2h_CDLDRAGONFLYDOJI', 0.011402754], ['2h_CDLHAMMER', 0.011561077], ['12h_CDLENGULFING', 0.011614598], ['2h_RSI', 0.01169088], ['2h_CDLLONGLEGGEDDOJI', 0.01212931], ['12h_CDLADVANCEBLOCK', 0.01279526], ['2h_CDLSTALLEDPATTERN', 0.0129304305], ['2h_CDLMARUBOZU', 0.013113995], ['12h_CDLTAKURI', 0.013276949], ['12h_CDLSHOOTINGSTAR', 0.013508402], ['2h_CDLSPINNINGTOP', 0.013724369], ['12h_CDLXSIDEGAP3METHODS', 0.014061773], ['2h_CDLSEPARATINGLINES', 0.014540767], ['2h_CDL3OUTSIDE', 0.014554604], ['2h_CDLLONGLINE', 0.0150164105], ['2h_CDLTAKURI', 0.015505098], ['12h_CDLHANGINGMAN', 0.016567245], ['2h_CDLADVANCEBLOCK', 0.016685594], ['2h_CDLINVERTEDHAMMER', 0.017416788], ['2h_CDLSHOOTINGSTAR', 0.017783737], ['2h_CDLBELTHOLD', 0.019352026], ['12h_CDLDOJISTAR', 0.019794088], ['12h_CDLSEPARATINGLINES', 0.019986678], ['2h_CDLEVENINGSTAR', 0.028756559]]
   }];
 
-  function showTable() {
+  function showTable(tableData) {
+    let tableString = '<table>';
+
+    // table headers/modelNames
+    tableString += '<tr>';
+    tableString += Object.keys(tableData[0]).map(modelName => {
+      return `<td><span class='sorting' onclick="sortByModel('${modelName}', 'up');">Up </span>${modelName}<span class='sorting' onclick="sortByModel('${modelName}', 'down');"> Down</span></td>`;
+    }).join('');
+    tableString += '</tr>';
+
+    // table body/model performance data
+    tableData.forEach(feature => {
+      tableString += '<tr>';
+      tableString += Object.keys(feature).map(modelName => {
+        return `<td>${feature[modelName]}</td>`;
+      }).join('');
+      tableString += '</tr>';
+    });
+
+    tableString += '</table>';
+
+    document.querySelector('#tableContainer').innerHTML = tableString;
+  }
+
+  function showDefaultTable() {
+    showModelPerformance();
+
     computeFeatures();
-    console.log('table');
+    const tableData = _.sortBy(featureArray, (v) => { return Math.abs(v.Total); });
+    showTable(tableData);
+  }
+
+  function showModelPerformance() {
+    let tableString = '<table>';
+    tableString += '<tr><td>ModelName</td><td>Up Correct Ratio</td><td>Down Correct Ratio</td></tr>';
+    fs.forEach(m => {
+      const { model, performance, up, down } = m;
+      tableString += '<tr>';
+      tableString += `<td>${model}</td>`;
+      tableString += `<td>${performance}</td>`;
+      tableString += `<td>${up}</td>`;
+      tableString += `<td>${down}</td>`;
+      tableString += `</tr>`;
+    });
+    tableString += '</table>';
+
+    document.querySelector('#modelPeformance').innerHTML = tableString;
+  }
+
+  function sortByModel(modelName, direction) {
+    let tableData = _.sortBy(featureArray, (v) => { return Math.abs(v[modelName]); });
+    if (direction === 'down')
+      tableData = tableData.reverse();
+
+    showTable(tableData);
   }
 
   function computeFeatures() {
     const features = {};
     fs.forEach(m => {
       const { model, data } = m;
+      const ratio = H100_WEIGHTS.includes(model) ? 100 : 1;
       data.forEach(d => {
         const featureName = d[0];
-        const featureValue = d[1];
+        const featureValue = d[1] * ratio;
         if (!features[featureName]) features[featureName] = {};
         features[featureName][model] = featureValue;
       });
     });
 
     // compute total and then convert the object to array
-    console.log(features);
+    Object.keys(features).forEach(featureName => {
+      const feature = features[featureName];
+      feature['Total'] = Object.keys(feature)
+        .map(modelName => feature[modelName])
+        .reduce(function (prev, curr, idx, arr) {
+          return Math.abs(prev) + Math.abs(curr);
+        });
+      feature['FeatureName'] = featureName;
+    });
+
+    featureArray = Object.keys(features).map(featureName => features[featureName]);
   }
 
-  showTable();
 </script>
 
 </html>
