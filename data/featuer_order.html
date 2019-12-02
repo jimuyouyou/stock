@@ -22,7 +22,8 @@
   <div id="modelPeformance"></div>
   <hr>
   <div id='tableContainer'></div>
-
+  <hr>
+  <textarea name="" id="featuresTextarea" cols="30" rows="10" onChange="showUnique()"></textarea>
 </body>
 <script>
   const H100_WEIGHTS = ['RandomForestClassifer', 'XGBClassifier'];
@@ -84,6 +85,12 @@
     computeFeatures();
     const tableData = _.sortBy(featureArray, (v) => { return Math.abs(v.Total); });
     showTable(tableData);
+  }
+
+  function showUnique() {
+    const featureNames = document.querySelector('#featuresTextarea').value.split('\n');
+    const featuresList = Array.from(new Set(featureNames));
+    document.querySelector('#featuresTextarea').value = featuresList.sort().join('\n');
   }
 
   function showModelPerformance() {
