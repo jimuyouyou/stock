@@ -62,7 +62,9 @@ new CronJob('1 1 1,13 * * *', async () => {
   await getUser(60); // 1hour
   await getUser(60 * 2); // 2hour
   await getUser(60 * 4); // 4hour
+  await getUser(60 * 12); // 12hour = 43200 seconds
+  await getUser(60 * 24 * 7); // 1week = 604800 seconds
   console.log('completed on', new Date());
 }, null, true, 'America/Los_Angeles');
 
-// getUser(3);
+// getUser(60 * 24 * 7);
